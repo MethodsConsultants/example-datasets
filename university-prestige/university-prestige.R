@@ -2,22 +2,17 @@ library(tidyverse)
 
 set.seed(1)
 
-n     <- 10000
-acad  <- rnorm(n)
-alum  <- acad * 0.2 + rnorm(n, 0, 0.1)
-extra <- acad * 1.3 + alum * 0.7 + rnorm(n, 0, 0.3)
+# specify model
+population.model <- '
+  acad  =~ acad1 + 0.85*acad2 + 1.25*acad3
+  alum  =~ alum1 + 0.6*alum2 + 1.4*alum3
+  extra =~ extra1 + 0.25*extra2 + 0.8*extra3
 
-# generate data to use for SEM model
-data <- tibble(
-  acad1  = acad  * 1.1  + rnorm(n, 0, 0.25),
-  acad2  = acad  * 0.9  + rnorm(n, 0, 0.15),
-  acad3  = acad  * 0.75 + rnorm(n, 0, 0.20),
-  alum1  = alum  * 1.25 + rnorm(n, 0, 0.50),
-  alum2  = alum  * 0.9  + rnorm(n, 0, 0.30),
-  alum3  = alum  * 1.1  + rnorm(n, 0, 0.20),
-  extra1 = extra * 0.8  + rnorm(n, 0, 0.20),
-  extra2 = extra * 1.1  + rnorm(n, 0, 0.40),
-  extra3 = extra * 1.2  + rnorm(n, 0, 0.10)
-)
+  alum  ~ 0.66*acad
+  extra ~ 0.52*acad + 0.61*alum
+'
+
+# generate data
+data <- lavaan::simulateData(population.model, sample.nobs=10000L)
 
 write_csv(data, "university-prestige.csv")
